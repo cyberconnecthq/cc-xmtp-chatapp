@@ -4,6 +4,12 @@ const nextConfig = {
   images: {
     loader: "akamai",
     path: "",
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {

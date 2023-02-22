@@ -3,12 +3,16 @@ import { useEnsAvatar } from "wagmi";
 import { address } from "./Address";
 import { ProfileByAddress } from "../graphql/ProfileByAddress";
 import { gql, useQuery } from '@apollo/client';
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import {parseURL} from "../helpers";
 
 type AvatarProps = {
   peerAddress: address;
 };
 
 const Avatar = ({ peerAddress }: AvatarProps) => {
+  const [src, setSrc] = useState("/assets/avatar-placeholder.svg");
   const { loading: isLoading, error, data } = useQuery(ProfileByAddress, { variables: { "address": peerAddress } });
 
   // if (!data.address.wallet.primaryProfile.metadataInfo.avatar) {
@@ -17,6 +21,15 @@ const Avatar = ({ peerAddress }: AvatarProps) => {
   //   });
 
   // }
+  useEffect(() => {
+    if (data?.address?.wallet?.primaryProfile?.metadataInfo?.avatar) {
+      console.log("avatar:", data?.address?.wallet?.primaryProfile?.metadataInfo?.avatar)
+      const parsedURL = parseURL(data?.address?.wallet?.primaryProfile?.metadataInfo?.avatar);
+      console.log("parsedURL:", parsedURL)
+      setSrc(parsedURL);
+    } else {
+      setSrc("/assets/avatar-placeholder.svg");
+    }}, [peerAddress, data]);
 
   if (isLoading) {
     return (
@@ -29,12 +42,13 @@ const Avatar = ({ peerAddress }: AvatarProps) => {
   if (data) {
     return (
       <div>
-        <div className="w-10 h-10 rounded-full border border-n-80" />
+        <div className="w-10 h-10 rounded-full border border-n-80" /> 
         <img
           className="w-10 h-10 rounded-full z-10 -mt-10"
-          src={data?.address?.wallet?.primaryProfile?.metadataInfo?.avatar }
-          // alt={peerAddress}
-        />
+          src={src}
+          onError={() => setSrc("/assets/avatar-placeholder.svg")}
+          alt={peerAddress}
+        />        
       </div>
     );
   }

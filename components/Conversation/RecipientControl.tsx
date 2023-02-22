@@ -33,7 +33,7 @@ const RecipientControl = ({
   const [recipientInputMode, setRecipientInputMode] = useState(
     RecipientInputMode.InvalidEntry,
   );
-  const { isValid, ensName, ensAddress, ccName, ccAddress } = useWalletAddress();
+  const { isValid, ensName, ensAddress, ccName } = useWalletAddress();
   const conversations = useXmtpStore((state) => state.conversations);
   const setConversations = useXmtpStore((state) => state.setConversations);
   const { address: walletAddress } = useAccount();

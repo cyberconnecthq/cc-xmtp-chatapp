@@ -10,6 +10,7 @@ import {
   isValidLongWalletAddress,
   isValidRecipientAddressFormat,
 } from "../helpers";
+import { client as apolloClient } from "../graphql/api";
 import { useXmtpStore } from "../store/xmtp";
 
 const useWalletAddress = (address?: address | string) => {
@@ -37,20 +38,18 @@ const useWalletAddress = (address?: address | string) => {
     enabled: isValidLongWalletAddress(addressToUse),
   });
 
+  const { loading: ccNameLoading, data: ccNameData } = useQuery(ProfileByAddress, { variables: { "address": addressToUse } });
   // Get CC name if exists from full address
   // if (isValidLongWalletAddress(addressToUse)){
-    useEffect(() => {
-      const { loading: ccNameLoading, data: ccNameData } = useQuery(ProfileByAddress, { variables: { "address": addressToUse } });
-      const ccName = ccNameData?.address?.wallet?.primaryProfile?.handle;
-      console.log("ccName type:", Object.keys(ccNameData));
-      setCcName(ccName);
-    }, [recipientWalletAddress, address]);
     
-  // }
-
+    
   useEffect(() => {
-    setAddressToUse(address || recipientWalletAddress);
-  }, [recipientWalletAddress, address]);
+      setAddressToUse(address || recipientWalletAddress);
+      const ccHandle = ccNameData?.address?.wallet?.primaryProfile?.handle;
+      const ccName = ccHandle ? ccHandle + ".cc" : "";
+      setCcName(ccName);
+      console.log("ccName", ccName)
+  }, [recipientWalletAddress, address, ccNameData]);
 
   useEffect(() => {
     const conversationIdArray = conversationId?.split("/") ?? [];
@@ -78,7 +77,7 @@ const useWalletAddress = (address?: address | string) => {
     ensAddress,
     ensName,
     ccName,
-    isLoading: ccNameLoading || ensAddressLoading || ensNameLoading,
+    isLoading: ensAddressLoading || ensNameLoading,
   };
 };
 

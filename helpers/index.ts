@@ -5,3 +5,4 @@ export * from "./appVersion";
 export * from "./keys";
 export * from "./constants";
 export * from "./domHelpers";
+export * from "./parseUrl";
