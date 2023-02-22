@@ -34,7 +34,7 @@ const Avatar = ({ peerAddress }: AvatarProps) => {
       const parsedURL = parseURL(
         data?.address?.wallet?.primaryProfile?.metadataInfo?.avatar,
       );
-      console.log("parsedURL:", parsedURL);
+      // console.log("parsedURL:", parsedURL);
       setSrc(parsedURL);
     } else {
       setSrc("/assets/avatar-placeholder.svg");

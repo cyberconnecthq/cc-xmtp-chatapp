@@ -50,7 +50,7 @@ const useWalletAddress = (address?: address | string) => {
     const ccHandle = ccNameData?.address?.wallet?.primaryProfile?.handle;
     const ccName = ccHandle ? ccHandle + ".cc" : "";
     setCcName(ccName);
-    console.log("ccName", ccName);
+    // console.log("ccName", ccName);
   }, [recipientWalletAddress, address, ccNameData]);
 
   useEffect(() => {

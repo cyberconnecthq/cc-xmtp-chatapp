@@ -10,7 +10,7 @@ type AddressProps = {
 
 const Address = ({ address, className }: AddressProps): JSX.Element => {
   const { ensName, ccName, isLoading } = useWalletAddress(address);
-  console.log("ensName", ensName, "ccName", ccName);
+  // console.log("ensName", ensName, "ccName", ccName);
   let userLink = `https://etherscan.io/address/${address}`;
   if (ccName) {
     userLink = `https://www.link3.to/${ccName.replace(".cc", "")}`;

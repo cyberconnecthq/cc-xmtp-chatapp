@@ -6,6 +6,14 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import useHandleConnect from "../hooks/useHandleConnect";
 import useInitXmtpClient from "../hooks/useInitXmtpClient";
+import MyListbox from "./CyberConnect/MyListbox";
+import { useEffect, useState } from "react";
+import { useQuery } from "@apollo/client";
+import {
+  client as apolloClient,
+  BatchAddressesIsFollowedByMe,
+  AddressFollowingMe,
+} from "../graphql";
 
 type NavigationPanelProps = {
   isError: boolean;
@@ -20,7 +28,7 @@ const NavigationPanel = ({ isError }: NavigationPanelProps): JSX.Element => {
   return (
     <div className="flex-grow flex flex-col h-[calc(100vh-8rem)] overflow-y-auto">
       {address && client !== null ? (
-        <ConversationsPanel />
+        <ConversationsPanel walletAddress={address} />
       ) : (
         <>
           {!address ? (
@@ -133,12 +141,119 @@ const NoXMTPConnectedMessage: React.FC<{
   );
 };
 
-const ConversationsPanel = (): JSX.Element => {
+const ConversationsPanel = ({
+  walletAddress,
+}: {
+  walletAddress: string;
+}): JSX.Element => {
   const client = useXmtpStore((state) => state.client);
   const loadingConversations = useXmtpStore(
     (state) => state.loadingConversations,
   );
+  const conversationsMap = useXmtpStore((state) => state.conversations);
+  const conversations = Array.from(conversationsMap.values());
+  console.log("conversationsMap", conversationsMap);
+  console.log("conversations", conversations);
+  let peersDuplicate = conversations.map((x) => x.peerAddress);
+  const peers = peersDuplicate.filter(
+    (n, i) => peersDuplicate.indexOf(n) === i,
+  );
+  console.log("peers", peers);
 
+  const [followings, setFollowings] = useState<any>([]);
+  const [filterMode, setFilterMode] = useState<number>(0);
+  const [isVerified, setIsVerified] = useState<any>();
+  const { loading: followingLoading, data: followingData } = useQuery(
+    BatchAddressesIsFollowedByMe,
+    { variables: { toAddrList: peers, me: walletAddress } },
+  );
+
+  useEffect(() => {
+    const handleFilter = async () => {
+      console.log(followingData);
+      if (followingData) {
+        let temp: any = {};
+        let peerAddresses = [];
+        peerAddresses = followingData?.batchGetAddresses;
+        console.log("peerAddresses", peerAddresses);
+        peerAddresses.forEach((peerAddress: any) => {
+          temp[peerAddress.address.toLowerCase()] = peerAddress?.wallet
+            ?.primaryProfile?.isFollowedByMe
+            ? 2
+            : 0;
+        });
+        console.log("temp", temp);
+        setIsVerified(temp);
+      }
+      console.log("isVerified", isVerified);
+      if (isVerified) {
+        // const followerData = async (
+        //   address: string,
+        //   me: string,
+        // ): Promise<{ data: any }> => {
+        //   const data = await apolloClient.query({
+        //     query: AddressFollowingMe,
+        //     variables: {
+        //       address: address,
+        //       me: me,
+        //     },
+        //   });
+        //   return data;
+        // };
+        peers.forEach((peerAddress: any) => {
+          console.log("peerAddress", peerAddress);
+          console.log("walletAddress", walletAddress);
+          const { data } = useQuery(AddressFollowingMe, {
+            variables: {
+              address: walletAddress,
+              me: peerAddress,
+            },
+          });
+          // const data = followerData(walletAddress, peerAddress);
+          console.log("data", data);
+          isVerified[peerAddress.toLowerCase()] += data?.address?.wallet
+            ?.primaryProfile?.isFollowedByMe
+            ? 1
+            : 0;
+          console.log("isVerified", isVerified);
+          Object.keys(isVerified).forEach((key: any) => {
+            if (isVerified[key] === filterMode) {
+              isVerified[key] = true;
+            } else {
+              isVerified[key] = false;
+            }
+          });
+
+          // followerData(walletAddress, peerAddress).then((data) => {
+          //   isVerified[peerAddress.address.toLowerCase()] += data?.address?.wallet
+          //     ?.primaryProfile?.isFollowedByMe
+          //     ? 1
+          //     : 0;
+          // });
+        });
+      }
+    };
+    handleFilter();
+  }, [filterMode]);
+
+  let filtered = conversationsMap;
+  console.log("filterMode", filterMode);
+  console.log("isVerified", isVerified);
+  if (filterMode && isVerified) {
+    console.log("filtering");
+    conversationsMap.forEach((value: any, key: any) => {
+      if (!isVerified[value.peerAddress.toLowerCase()]) {
+        filtered.delete(key); //.push(conversation);
+      }
+    });
+  }
+  console.log("filtered map", filtered);
+  // let filtered = conversations;
+  // if (filterMode) {
+  //   filtered = conversations.filter(
+  //     (conversation) => isVerified[conversation.peerAddress.toLowerCase()],
+  //   );
+  // }
   if (client === undefined) {
     return (
       <Loader
@@ -160,9 +275,12 @@ const ConversationsPanel = (): JSX.Element => {
   }
 
   return (
-    <nav className="flex-1 pb-4" data-testid="conversations-list-panel">
-      <ConversationsList />
-    </nav>
+    <div>
+      <MyListbox setFilterMode={setFilterMode} />
+      <nav className="flex-1 pb-4" data-testid="conversations-list-panel">
+        <ConversationsList conversations={filtered} />
+      </nav>
+    </div>
   );
 };
 
