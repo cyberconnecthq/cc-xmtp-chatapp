@@ -9,8 +9,8 @@ type AddressProps = {
 };
 
 const Address = ({ address, className }: AddressProps): JSX.Element => {
-  const { ensName, isLoading } = useWalletAddress(address);
-
+  const { ensName, ccName, isLoading } = useWalletAddress(address);
+  console.log("ensName", ensName, "ccName", ccName);
   return (
     <span
       className={classNames(
@@ -20,7 +20,7 @@ const Address = ({ address, className }: AddressProps): JSX.Element => {
       )}
       title={address}
       data-testid="connected-footer-secondary-text">
-      {ensName || shortAddress(address)}
+      {ccName || ensName || shortAddress(address)}
     </span>
   );
 };

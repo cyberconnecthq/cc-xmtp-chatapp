@@ -27,14 +27,13 @@ const Avatar = ({ peerAddress }: AvatarProps) => {
   }
 
   if (data) {
-    console.log(data)
     return (
       <div>
         <div className="w-10 h-10 rounded-full border border-n-80" />
         <img
           className="w-10 h-10 rounded-full z-10 -mt-10"
-          src={data?.address?.wallet?.primaryProfile?.metadataInfo?.avatar ?? "/assets/avatar-placeholder.svg"}
-          alt={peerAddress}
+          src={data?.address?.wallet?.primaryProfile?.metadataInfo?.avatar }
+          // alt={peerAddress}
         />
       </div>
     );

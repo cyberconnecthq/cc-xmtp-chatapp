@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { useEnsAddress, useEnsName } from "wagmi";
 import { address } from "../components/Address";
+import { ProfileByAddress } from "../graphql/ProfileByAddress";
+import { ProfileByHandle } from "../graphql/ProfileByHandle";
+import { gql, useQuery, useLazyQuery } from '@apollo/client';
 import {
+  isCCAddress,
   isEnsAddress,
   isValidLongWalletAddress,
   isValidRecipientAddressFormat,
@@ -17,6 +21,8 @@ const useWalletAddress = (address?: address | string) => {
   const [addressToUse, setAddressToUse] = useState(
     address || recipientWalletAddress,
   );
+  const [ccName, setCcName] = useState("");
+
   const isEns = isEnsAddress(addressToUse);
 
   // Get full address when only have ENS
@@ -30,6 +36,17 @@ const useWalletAddress = (address?: address | string) => {
     address: addressToUse as address,
     enabled: isValidLongWalletAddress(addressToUse),
   });
+
+  // Get CC name if exists from full address
+  // if (isValidLongWalletAddress(addressToUse)){
+    useEffect(() => {
+      const { loading: ccNameLoading, data: ccNameData } = useQuery(ProfileByAddress, { variables: { "address": addressToUse } });
+      const ccName = ccNameData?.address?.wallet?.primaryProfile?.handle;
+      console.log("ccName type:", Object.keys(ccNameData));
+      setCcName(ccName);
+    }, [recipientWalletAddress, address]);
+    
+  // }
 
   useEffect(() => {
     setAddressToUse(address || recipientWalletAddress);
@@ -60,7 +77,8 @@ const useWalletAddress = (address?: address | string) => {
     isEns,
     ensAddress,
     ensName,
-    isLoading: ensAddressLoading || ensNameLoading,
+    ccName,
+    isLoading: ccNameLoading || ensAddressLoading || ensNameLoading,
   };
 };
 

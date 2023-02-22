@@ -67,7 +67,8 @@ const AddressInput = ({
               handle
             }
           });
-          const address = otherUserProfileData.data.profileByHandle.owner.address;
+          console.log(otherUserProfileData?.data);
+          const address = otherUserProfileData?.data?.profileByHandle?.owner?.address;
           console.log(address);
           if (address) {
             submitValue && submitValue(address);
