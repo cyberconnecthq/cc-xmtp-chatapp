@@ -91,13 +91,13 @@ const RecipientControl = ({
   const userIsSender = recipientWalletAddress === walletAddress;
   const toName = ccName || ensName || recipientWalletAddress;
   let getUserLink = "";
-    if (ccName) {
-      getUserLink =  `https://www.link3.to/${ccName.replace('.cc','')}`;
-    } else if (ensName) {
-      getUserLink =  `https://app.ens.domains/name/${ensName}`;
-    } else {
-      getUserLink =  `https://etherscan.io/address/${recipientWalletAddress}`;
-    }
+  if (ccName) {
+    getUserLink = `https://www.link3.to/${ccName.replace(".cc", "")}`;
+  } else if (ensName) {
+    getUserLink = `https://app.ens.domains/name/${ensName}`;
+  } else {
+    getUserLink = `https://etherscan.io/address/${recipientWalletAddress}`;
+  }
   return (
     <div className="flex-col flex-1">
       <div className="flex-1 flex-col justify-center flex bg-zinc-50 md:border-b md:border-gray-200 md:px-4 md:pb-[2px] max-h-16 min-h-[4rem]">
@@ -128,13 +128,12 @@ const RecipientControl = ({
               </div>
               <div className="w-full">
                 {isValid && (
-                  <a href={getUserLink} target="_blank">
-                  <span
-                    className={recipientPillInputStyle(userIsSender)}
-                    data-testid="recipient-wallet-address">
-                    
-                    {toName}
-                  </span>
+                  <a href={getUserLink} target="_blank" rel="noreferrer">
+                    <span
+                      className={recipientPillInputStyle(userIsSender)}
+                      data-testid="recipient-wallet-address">
+                      {toName}
+                    </span>
                   </a>
                 )}
                 {!recipientWalletAddress && (

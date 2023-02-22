@@ -18,17 +18,17 @@ const Address = ({ address, className }: AddressProps): JSX.Element => {
     userLink = `https://app.ens.domains/name/${ensName}`;
   }
   return (
-    <a href={userLink} target="_blank">
-    <span
-      className={classNames(
-        className || "",
-        "font-mono",
-        isLoading ? "animate-pulse" : "",
-      )}
-      title={address}
-      data-testid="connected-footer-secondary-text">
-      {ccName || ensName || shortAddress(address)}
-    </span>
+    <a href={userLink} target="_blank" rel="noreferrer">
+      <span
+        className={classNames(
+          className || "",
+          "font-mono",
+          isLoading ? "animate-pulse" : "",
+        )}
+        title={address}
+        data-testid="connected-footer-secondary-text">
+        {ccName || ensName || shortAddress(address)}
+      </span>
     </a>
   );
 };

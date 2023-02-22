@@ -1,7 +1,7 @@
 import { fetchEnsAddress } from "@wagmi/core";
 import React, { useEffect, useRef, useState } from "react";
 import { ProfileByHandle } from "../graphql/ProfileByHandle";
-import { client as apolloClient } from '../graphql/api'
+import { client as apolloClient } from "../graphql/api";
 import {
   classNames,
   isCCAddress,
@@ -19,7 +19,6 @@ type AddressInputProps = {
   submitValue?: (address: address) => void;
   setRecipientInputMode?: (value: number) => void;
 };
-
 
 const AddressInput = ({
   id,
@@ -40,7 +39,6 @@ const AddressInput = ({
   useEffect(() => {
     focusInputElementRef();
   }, []);
-
 
   useEffect(() => {
     const handleSubmit = async () => {
@@ -64,11 +62,12 @@ const AddressInput = ({
           const otherUserProfileData = await apolloClient.query({
             query: ProfileByHandle,
             variables: {
-              handle
-            }
+              handle,
+            },
           });
           console.log(otherUserProfileData?.data);
-          const address = otherUserProfileData?.data?.profileByHandle?.owner?.address;
+          const address =
+            otherUserProfileData?.data?.profileByHandle?.owner?.address;
           console.log(address);
           if (address) {
             submitValue && submitValue(address);
