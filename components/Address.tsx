@@ -11,7 +11,14 @@ type AddressProps = {
 const Address = ({ address, className }: AddressProps): JSX.Element => {
   const { ensName, ccName, isLoading } = useWalletAddress(address);
   console.log("ensName", ensName, "ccName", ccName);
+  let userLink = `https://etherscan.io/address/${address}`;
+  if (ccName) {
+    userLink = `https://www.link3.to/${ccName.replace(".cc", "")}`;
+  } else if (ensName) {
+    userLink = `https://app.ens.domains/name/${ensName}`;
+  }
   return (
+    <a href={userLink} target="_blank">
     <span
       className={classNames(
         className || "",
@@ -22,6 +29,7 @@ const Address = ({ address, className }: AddressProps): JSX.Element => {
       data-testid="connected-footer-secondary-text">
       {ccName || ensName || shortAddress(address)}
     </span>
+    </a>
   );
 };
 
