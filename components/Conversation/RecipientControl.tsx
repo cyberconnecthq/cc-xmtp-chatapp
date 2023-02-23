@@ -13,8 +13,7 @@ import {
 } from "../../helpers";
 import { useAccount } from "wagmi";
 import { getRecipientInputSubtext } from "../../helpers";
-// import FollowButton from "../CyberConnect/FollowButton";
-import FollowButton from "../CyberConnect/UnfollowButton";
+import FollowUnfollowButton from "../CyberConnect/FollowUnfollowButton";
 
 type RecipientControlProps = {
   setShowMessageView: Function;
@@ -105,7 +104,7 @@ const RecipientControl = ({
     console.log("ccName & walletAddress", ccName, walletAddress);
     follow_unfollow = (
       <div className="justify-right right-16">
-        <FollowButton
+        <FollowUnfollowButton
           handle={ccName}
           // onSend={onSend}
         />

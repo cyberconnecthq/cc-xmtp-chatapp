@@ -125,7 +125,7 @@ const ConversationsList = ({
   if (!conversations || conversations.size == 0) {
     return <NoConversationsMessage />;
   }
-
+  console.log("conversations", conversations);
   return (
     <>
       {conversations &&

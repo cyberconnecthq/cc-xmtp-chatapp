@@ -1,11 +1,12 @@
 import { useCallback, useMemo, useState } from "react";
 import useCyberConnect from "./useCC";
+
 function useFollow() {
   const [isLoading, toggleIsLoading] = useState(false);
   const cc = useCyberConnect();
 
   const follow = useCallback(
-    async (handle) => {
+    async (handle: string) => {
       if (!cc)
         return {
           isError: true,
@@ -14,7 +15,7 @@ function useFollow() {
 
       toggleIsLoading(true);
       const error = await cc
-        .follow(window.ethereum.selectedAddress, handle)
+        .follow((window as any).ethereum?.selectedAddress, handle)
         .catch((error) => {
           console.log(error);
 

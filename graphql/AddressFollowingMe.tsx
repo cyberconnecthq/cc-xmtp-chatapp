@@ -1,15 +1,11 @@
 import { gql } from "@apollo/client";
 
-export const BatchAddressesIsFollowedByMe = gql`
-  query BatchAddressesIsFollowedByMe(
-    $me: AddressEVM!
-    $toAddrList: [AddressEVM!]!
-  ) {
-    batchGetAddresses(addresses: $toAddrList) {
-      address
+export const AddressFollowingMe = gql`
+  query AddressFollowingMe($me: AddressEVM!, $address: AddressEVM!) {
+    address(address: $me) {
       wallet {
         primaryProfile {
-          isFollowedByMe(me: $me)
+          isFollowedByMe(me: $address)
         }
       }
     }

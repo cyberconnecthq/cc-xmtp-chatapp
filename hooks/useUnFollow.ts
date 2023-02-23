@@ -6,7 +6,7 @@ function useUnFollow() {
   const cc = useCyberConnect();
 
   const unFollow = useCallback(
-    async (handle) => {
+    async (handle: string) => {
       if (!cc) {
         return {
           isError: true,
@@ -17,7 +17,7 @@ function useUnFollow() {
       toggleIsLoading(true);
 
       const error = await cc
-        .unfollow(window.ethereum.selectedAddress, handle)
+        .unfollow((window as any).ethereum?.selectedAddress, handle)
         .catch((error) => error)
         .finally(() => toggleIsLoading(false));
 
@@ -30,7 +30,7 @@ function useUnFollow() {
         };
       }
     },
-    [cc]
+    [cc],
   );
 
   return useMemo(
@@ -38,7 +38,7 @@ function useUnFollow() {
       isLoading,
       unFollow,
     }),
-    [isLoading, unFollow]
+    [isLoading, unFollow],
   );
 }
 

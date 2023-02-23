@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useEnsAddress, useEnsName } from "wagmi";
 import { address } from "../components/Address";
 import { ProfileByAddress } from "../graphql/ProfileByAddress";
-import { ProfileByHandle } from "../graphql/ProfileByHandle";
 import { gql, useQuery, useLazyQuery } from "@apollo/client";
 import {
   isCCAddress,
@@ -10,7 +9,6 @@ import {
   isValidLongWalletAddress,
   isValidRecipientAddressFormat,
 } from "../helpers";
-import { client as apolloClient } from "../graphql/api";
 import { useXmtpStore } from "../store/xmtp";
 
 const useWalletAddress = (address?: address | string) => {

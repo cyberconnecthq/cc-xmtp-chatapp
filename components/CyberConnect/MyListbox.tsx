@@ -1,24 +1,24 @@
-import { Fragment, useState } from 'react'
-import { Listbox, Transition } from '@headlessui/react'
-import { CheckIcon, SelectorIcon } from '@heroicons/react/solid'
+import { Fragment, useState } from "react";
+import { Listbox, Transition } from "@headlessui/react";
+import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 
 type MyListboxProps = {
-  setFilterMode: (index: number) => void
-}
+  setFilterMode: (index: number) => void;
+};
 
 const people = [
-  { name: 'All Messages', index: 0 },
-  { name: 'Followings', index: 1 },
-  { name: 'Followers', index: 2 },
-  { name: 'Connected', index: 3 },
-]
+  { name: "All Messages", index: 0 },
+  { name: "Followings", index: 1 },
+  { name: "Followers", index: 2 },
+  { name: "Connected", index: 3 },
+];
 
 export default function Example({ setFilterMode }: MyListboxProps) {
-  const [selected, setSelected] = useState(people[0])
+  const [selected, setSelected] = useState(people[0]);
 
   function handleChange(e: any) {
-    setSelected(e)
-    setFilterMode(e.index)
+    setSelected(e);
+    setFilterMode(e.index);
   }
 
   return (
@@ -38,26 +38,23 @@ export default function Example({ setFilterMode }: MyListboxProps) {
             as={Fragment}
             leave="transition ease-in duration-100"
             leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
+            leaveTo="opacity-0">
             <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
               {people.map((person, personIdx) => (
                 <Listbox.Option
                   key={personIdx}
                   className={({ active }) =>
                     `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                      active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
+                      active ? "bg-amber-100 text-amber-900" : "text-gray-900"
                     }`
                   }
-                  value={person}
-                >
+                  value={person}>
                   {({ selected }) => (
                     <>
                       <span
                         className={`block truncate ${
-                          selected ? 'font-medium' : 'font-normal'
-                        }`}
-                      >
+                          selected ? "font-medium" : "font-normal"
+                        }`}>
                         {person.name}
                       </span>
                       {selected ? (
@@ -74,5 +71,5 @@ export default function Example({ setFilterMode }: MyListboxProps) {
         </div>
       </Listbox>
     </div>
-  )
+  );
 }

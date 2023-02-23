@@ -2,7 +2,7 @@ import { useState } from "react";
 import useFollow from "../../hooks/useFollow";
 import useUnFollow from "../../hooks/useUnFollow";
 
-const FollowButton = ({ handle }: { handle: string }) => {
+const FollowUnfollowButton = ({ handle }: { handle: string }) => {
   const [isFollowing, toggleIsFollowing] = useState(false);
   const { follow } = useFollow();
   const { unFollow } = useUnFollow();
@@ -26,4 +26,4 @@ const FollowButton = ({ handle }: { handle: string }) => {
   );
 };
 
-export default FollowButton;
+export default FollowUnfollowButton;

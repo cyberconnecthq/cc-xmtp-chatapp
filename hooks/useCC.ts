@@ -10,7 +10,7 @@ const getCCInstance = (provider: any) => {
 
   const instance = new CyberConnect({
     namespace: "CyberConnect",
-    env: Env.STAGING,
+    env: Env.PRODUCTION,
     provider,
     signingMessageEntity: "CyberConnect",
   });
@@ -20,8 +20,8 @@ const getCCInstance = (provider: any) => {
   return instance;
 };
 
-function useCyberConnect() {
-  const [cc, setCc] = useState(null);
+function useCyberConnect(): CyberConnect | null {
+  const [cc, setCc] = useState<CyberConnect | null>(null);
 
   useEffect(() => {
     // force client render
