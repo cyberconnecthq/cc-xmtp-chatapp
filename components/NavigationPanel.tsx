@@ -187,34 +187,34 @@ const ConversationsPanel = ({
       }
       console.log("isVerified", isVerified);
       if (isVerified) {
-        // const followerData = async (
-        //   address: string,
-        //   me: string,
-        // ): Promise<{ data: any }> => {
-        //   const data = await apolloClient.query({
-        //     query: AddressFollowingMe,
-        //     variables: {
-        //       address: address,
-        //       me: me,
-        //     },
-        //   });
-        //   return data;
-        // };
+        const followerData = async (
+          address: string,
+          me: string,
+        ): Promise<{ data: any }> => {
+          const data = await apolloClient.query({
+            query: AddressFollowingMe,
+            variables: {
+              address: address,
+              me: me,
+            },
+          });
+          return data;
+        };
         peers.forEach((peerAddress: any) => {
           console.log("peerAddress", peerAddress);
           console.log("walletAddress", walletAddress);
-          const { data } = useQuery(AddressFollowingMe, {
-            variables: {
-              address: walletAddress,
-              me: peerAddress,
-            },
-          });
           // const data = followerData(walletAddress, peerAddress);
-          console.log("data", data);
-          isVerified[peerAddress.toLowerCase()] += data?.address?.wallet
-            ?.primaryProfile?.isFollowedByMe
-            ? 1
-            : 0;
+          // console.log("data", data);
+          // isVerified[peerAddress.toLowerCase()] += data?.address?.wallet
+          //   ?.primaryProfile?.isFollowedByMe
+          //   ? 1
+          //   : 0;
+          followerData(walletAddress, peerAddress).then((data) => {
+            isVerified[peerAddress.toLowerCase()] += data?.address?.wallet
+              ?.primaryProfile?.isFollowedByMe
+              ? 1
+              : 0;
+          });
           console.log("isVerified", isVerified);
           Object.keys(isVerified).forEach((key: any) => {
             if (isVerified[key] === filterMode) {
@@ -223,13 +223,6 @@ const ConversationsPanel = ({
               isVerified[key] = false;
             }
           });
-
-          // followerData(walletAddress, peerAddress).then((data) => {
-          //   isVerified[peerAddress.address.toLowerCase()] += data?.address?.wallet
-          //     ?.primaryProfile?.isFollowedByMe
-          //     ? 1
-          //     : 0;
-          // });
         });
       }
     };

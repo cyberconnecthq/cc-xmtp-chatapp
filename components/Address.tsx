@@ -1,10 +1,10 @@
 import { classNames, shortAddress } from "../helpers";
 import useWalletAddress from "../hooks/useWalletAddress";
-
 export type address = `0x${string}`;
 
 type AddressProps = {
   address: address;
+  enableFollow?: boolean;
   className?: string;
 };
 

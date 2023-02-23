@@ -27,6 +27,8 @@
     "url": "https://github.com/xmtp-labs/xmtp-inbox-web/issues"
   },
   "dependencies": {
+    "@apollo/client": "^3.7.3",
+    "@cyberlab/cyberconnect-v2": "^0.0.1-alpha.16",
     "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.5",
     "@rainbow-me/rainbowkit": "^0.8.1",
@@ -42,8 +44,7 @@
     "react-infinite-scroll-component": "^6.1.0",
     "react-qr-code": "^2.0.11",
     "wagmi": "^0.9.6",
-    "zustand": "^4.3.2",
-    "@apollo/client": "^3.7.3"
+    "zustand": "^4.3.2"
   },
   "overrides": {
     "autoprefixer": "10.4.5"

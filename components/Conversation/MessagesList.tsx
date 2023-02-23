@@ -35,7 +35,7 @@ const MessageTile = ({ message }: MessageTileProps): JSX.Element => (
     <div className="ml-2 max-w-[90%]">
       <div>
         <AddressPill address={message.senderAddress as address} />
-        <span className="text-sm font-normal place-self-end text-n-300 text-md uppercase">
+        <span className="text-sm font-normal place-self-end text-n-300 uppercase">
           {formatTime(message.sent)}
         </span>
       </div>

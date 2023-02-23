@@ -1,42 +1,29 @@
-import { useState, useEffect } from 'react'
+import { useState } from "react";
+import useFollow from "../../hooks/useFollow";
+import useUnFollow from "../../hooks/useUnFollow";
 
-import CyberConnect, { Env, Blockchain } from "@cyberlab/cyberconnect";
+const FollowButton = ({ handle }: { handle: string }) => {
+  const [isFollowing, toggleIsFollowing] = useState(false);
+  const { follow } = useFollow();
+  const { unFollow } = useUnFollow();
 
-type FollowButtonProps = {
-  recipientWalletAddr: string,
-}
+  const handleClick = async () => {
+    if (!isFollowing) {
+      const { isSuccess } = await follow(handle);
 
-function FollowButton({ recipientWalletAddr }: FollowButtonProps) {
-  const [ cyberConnect, setCyberConnect ] = useState<any>()
+      if (isSuccess) toggleIsFollowing(true);
+    } else {
+      const { isSuccess } = await unFollow(handle);
 
-  useEffect(() => {
-    const temp = new CyberConnect({
-      namespace: "CyberConnect",
-      env: Env.PRODUCTION,
-      chain: Blockchain.ETH,
-      provider: window.ethereum
-    });
-
-    setCyberConnect(temp)
-  }, [])
-
-  const handleOnClick = async () => {
-    try {
-      await cyberConnect.disconnect(recipientWalletAddr);
-      alert(`Success: you unfollowed ${recipientWalletAddr}!`);
-    } catch (error) {
-      alert('Not following: ' + JSON.stringify(error))
+      if (isSuccess) toggleIsFollowing(false);
     }
   };
 
   return (
-    <button
-      className="inline-flex items-center h-7 md:h-6 px-4 py-4 my-4 bg-p-400 border border-p-300 hover:bg-p-300 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-n-100 focus-visible:ring-offset-p-600 focus-visible:border-n-100 focus-visible:outline-none active:bg-p-500 active:border-p-500 active:ring-0 text-sm md:text-xs md:font-semibold tracking-wide text-white rounded"
-      onClick={handleOnClick}
-    >
-      Unfollow
+    <button className="follow-btn" onClick={handleClick}>
+      {isFollowing ? "UnFollow" : "Follow"}
     </button>
   );
-}
+};
 
 export default FollowButton;
