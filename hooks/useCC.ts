@@ -13,7 +13,7 @@ const getCCInstance = (provider: any) => {
     namespace: "CyberConnect",
     env: Env.PRODUCTION,
     provider,
-    signingMessageEntity: "CyberConnect",
+    signingMessageEntity: "CyberConnect & XMTP",
   });
 
   CCSingleInstance = instance;
@@ -25,9 +25,9 @@ function useCyberConnect(): CyberConnect | null {
   const [cc, setCc] = useState<CyberConnect | null>(null);
 
   useEffect(() => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // const provider = new ethers.providers.Web3Provider(window.ethereum);
     // force client render
-    setCc(getCCInstance(provider));
+    setCc(getCCInstance(window.ethereum));
   }, []);
 
   return useMemo(() => cc, [cc]);
