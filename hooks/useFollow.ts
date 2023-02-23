@@ -14,6 +14,12 @@ function useFollow() {
         };
 
       toggleIsLoading(true);
+      // console.log(
+      //   "follow",
+      //   handle,
+      //   "using",
+      //   (window as any).ethereum?.selectedAddress,
+      // );
       const error = await cc
         .follow((window as any).ethereum?.selectedAddress, handle)
         .catch((error) => {

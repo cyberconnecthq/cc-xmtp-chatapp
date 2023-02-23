@@ -1,5 +1,6 @@
 import CyberConnect, { Env } from "@cyberlab/cyberconnect-v2";
 import { useEffect, useMemo, useState } from "react";
+import { ethers } from "ethers";
 
 let CCSingleInstance: any;
 
@@ -24,8 +25,9 @@ function useCyberConnect(): CyberConnect | null {
   const [cc, setCc] = useState<CyberConnect | null>(null);
 
   useEffect(() => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
     // force client render
-    setCc(getCCInstance(window.ethereum));
+    setCc(getCCInstance(provider));
   }, []);
 
   return useMemo(() => cc, [cc]);

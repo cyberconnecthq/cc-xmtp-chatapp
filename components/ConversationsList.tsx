@@ -108,7 +108,6 @@ const ConversationsList = ({
   conversations,
 }: ConversationsListProps): JSX.Element => {
   // const conversations_original = useXmtpStore((state) => state.conversations);
-  // console.log("conversations_original", conversations_original);
   const previewMessages = useXmtpStore((state) => state.previewMessages);
 
   const orderByLatestMessage = (
@@ -125,7 +124,6 @@ const ConversationsList = ({
   if (!conversations || conversations.size == 0) {
     return <NoConversationsMessage />;
   }
-  console.log("conversations", conversations);
   return (
     <>
       {conversations &&

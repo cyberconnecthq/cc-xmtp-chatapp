@@ -242,7 +242,7 @@ const ConversationsPanel = ({
       setFiltered(tmp);
     };
     handleFilter();
-  }, [filterMode]);
+  }, [filterMode, conversationsMap]);
 
   if (client === undefined) {
     return (
@@ -264,6 +264,7 @@ const ConversationsPanel = ({
     );
   }
   //
+  console.log("filtered", filtered);
   return (
     <div>
       <MyListbox setFilterMode={setFilterMode} />
