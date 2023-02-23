@@ -12,6 +12,13 @@ export const BatchAddressesIsFollowedByMe = gql`
           isFollowedByMe(me: $me)
         }
       }
+      followings {
+        edges {
+          node {
+            handle
+          }
+        }
+      }
     }
   }
 `;

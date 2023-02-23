@@ -8,12 +8,14 @@ import useHandleConnect from "../hooks/useHandleConnect";
 import useInitXmtpClient from "../hooks/useInitXmtpClient";
 import MyListbox from "./CyberConnect/MyListbox";
 import { useEffect, useState } from "react";
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import {
-  client as apolloClient,
+  // client as apolloClient,
   BatchAddressesIsFollowedByMe,
   AddressFollowingMe,
 } from "../graphql";
+import useWalletAddress from "../hooks/useWalletAddress";
+import { Conversation } from "@xmtp/xmtp-js";
 
 type NavigationPanelProps = {
   isError: boolean;
@@ -141,6 +143,12 @@ const NoXMTPConnectedMessage: React.FC<{
   );
 };
 
+function extractHandles(array: Array<any>) {
+  return array.map(function (item: any) {
+    return item.node.handle;
+  });
+}
+
 const ConversationsPanel = ({
   walletAddress,
 }: {
@@ -150,103 +158,95 @@ const ConversationsPanel = ({
   const loadingConversations = useXmtpStore(
     (state) => state.loadingConversations,
   );
+  const { ccName } = useWalletAddress(walletAddress);
+  console.log("ccName", ccName);
   const conversationsMap = useXmtpStore((state) => state.conversations);
   const conversations = Array.from(conversationsMap.values());
-  console.log("conversationsMap", conversationsMap);
-  console.log("conversations", conversations);
+  // console.log("conversationsMap", conversationsMap);
+  // console.log("conversations", conversations);
   let peersDuplicate = conversations.map((x) => x.peerAddress);
   const peers = peersDuplicate.filter(
     (n, i) => peersDuplicate.indexOf(n) === i,
   );
   console.log("peers", peers);
 
-  const [followings, setFollowings] = useState<any>([]);
   const [filterMode, setFilterMode] = useState<number>(0);
   const [isVerified, setIsVerified] = useState<any>();
-  const { loading: followingLoading, data: followingData } = useQuery(
-    BatchAddressesIsFollowedByMe,
-    { variables: { toAddrList: peers, me: walletAddress } },
-  );
-
+  const [filtered, setFiltered] = useState<any>(conversationsMap);
+  const [getFollowingData] = useLazyQuery(BatchAddressesIsFollowedByMe);
+  // const { data } = useQuery(BatchAddressesIsFollowedByMe, {
+  //   variables: { toAddrList: peers, me: walletAddress },
+  // });
+  // console.log("data", data);
   useEffect(() => {
     const handleFilter = async () => {
-      console.log(followingData);
-      if (followingData) {
-        let temp: any = {};
-        let peerAddresses = [];
-        peerAddresses = followingData?.batchGetAddresses;
-        console.log("peerAddresses", peerAddresses);
-        peerAddresses.forEach((peerAddress: any) => {
-          temp[peerAddress.address.toLowerCase()] = peerAddress?.wallet
-            ?.primaryProfile?.isFollowedByMe
-            ? 2
-            : 0;
-        });
-        console.log("temp", temp);
-        setIsVerified(temp);
-      }
-      console.log("isVerified", isVerified);
-      if (isVerified) {
-        const followerData = async (
-          address: string,
-          me: string,
-        ): Promise<{ data: any }> => {
-          const data = await apolloClient.query({
-            query: AddressFollowingMe,
-            variables: {
-              address: address,
-              me: me,
-            },
-          });
-          return data;
-        };
-        peers.forEach((peerAddress: any) => {
-          console.log("peerAddress", peerAddress);
-          console.log("walletAddress", walletAddress);
-          // const data = followerData(walletAddress, peerAddress);
-          // console.log("data", data);
-          // isVerified[peerAddress.toLowerCase()] += data?.address?.wallet
-          //   ?.primaryProfile?.isFollowedByMe
-          //   ? 1
-          //   : 0;
-          followerData(walletAddress, peerAddress).then((data) => {
-            isVerified[peerAddress.toLowerCase()] += data?.address?.wallet
-              ?.primaryProfile?.isFollowedByMe
-              ? 1
-              : 0;
-          });
-          console.log("isVerified", isVerified);
-          Object.keys(isVerified).forEach((key: any) => {
-            if (isVerified[key] === filterMode) {
-              isVerified[key] = true;
-            } else {
-              isVerified[key] = false;
-            }
-          });
-        });
-      }
+      const { data } = await getFollowingData({
+        variables: { toAddrList: peers, me: walletAddress },
+      });
+      let temp: any = {};
+      const peerAddresses = data?.batchGetAddresses;
+      console.log("peerAddresses", peerAddresses);
+      peerAddresses.forEach((peerAddress: any) => {
+        const peerFollowedByMe =
+          peerAddress?.wallet?.primaryProfile?.isFollowedByMe;
+        let meFollowingPeer = false;
+        console.log("ccName", ccName);
+        if (ccName) {
+          const extractHandles = (array) =>
+            array.map((item) => item.node.handle);
+          const followingsArr = peerAddress?.followings?.edges || [{}];
+          const followingHandles = extractHandles(followingsArr);
+          if (followingHandles.includes(ccName)) {
+            meFollowingPeer = true;
+          }
+        }
+        console.log(
+          "peerFollowedByMe",
+          peerFollowedByMe,
+          "meFollowingPeer",
+          meFollowingPeer,
+        );
+        if (peerFollowedByMe && !meFollowingPeer) {
+          temp[peerAddress.address.toLowerCase()] = 2;
+        } else if (peerFollowedByMe && meFollowingPeer) {
+          temp[peerAddress.address.toLowerCase()] = 3;
+        } else if (!peerFollowedByMe && meFollowingPeer) {
+          temp[peerAddress.address.toLowerCase()] = 1;
+        } else {
+          temp[peerAddress.address.toLowerCase()] = 0;
+        }
+        // temp[peerAddress.address.toLowerCase()] = peerAddress?.wallet
+        //   ?.primaryProfile?.isFollowedByMe
+        //   ? 2
+        //   : 0;
+      });
+      Object.keys(temp).forEach((key: any) => {
+        if (temp[key] === filterMode) {
+          temp[key] = true;
+        } else {
+          temp[key] = false;
+        }
+      });
+      console.log("temp", temp);
+      setIsVerified(temp);
     };
     handleFilter();
   }, [filterMode]);
 
-  let filtered = conversationsMap;
-  console.log("filterMode", filterMode);
-  console.log("isVerified", isVerified);
-  if (filterMode && isVerified) {
-    console.log("filtering");
-    conversationsMap.forEach((value: any, key: any) => {
-      if (!isVerified[value.peerAddress.toLowerCase()]) {
-        filtered.delete(key); //.push(conversation);
-      }
-    });
-  }
-  console.log("filtered map", filtered);
-  // let filtered = conversations;
-  // if (filterMode) {
-  //   filtered = conversations.filter(
-  //     (conversation) => isVerified[conversation.peerAddress.toLowerCase()],
-  //   );
-  // }
+  useEffect(() => {
+    if (filterMode && isVerified) {
+      console.log("filtering");
+      let tmp: any = {};
+      conversationsMap.forEach((value: any, key: any) => {
+        if (isVerified[value.peerAddress.toLowerCase()]) {
+          tmp[key] = value; //.push(conversation);
+        }
+      });
+      console.log("New filtered conv map", tmp);
+      setFiltered(tmp);
+    }
+  }, [filterMode, isVerified]);
+
   if (client === undefined) {
     return (
       <Loader
