@@ -20,7 +20,7 @@ This app has not undergone a formal security audit.
 > **Note**  
 > You might also be interested in the [XMTP Quickstart React chat app](https://github.com/xmtp/xmtp-quickstart-react), which provides lighter-weight code than the XMTP Inbox app. You can use the Quickstart app to learn to build a basic messaging app.
 
-## Get started
+## Get started 
 
 ### Configure Infura
 
