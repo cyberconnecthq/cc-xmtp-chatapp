@@ -212,14 +212,19 @@ const ConversationsPanel = ({
         // determine the isVerified status based on the filter mode
         if (filterMode) {
           if (peerFollowingMe && !meFollowingPeer) {
+            tempIsVerified[peerAddress.address.toLowerCase()] = 1;
+          } else if (!peerFollowingMe && meFollowingPeer) {
             tempIsVerified[peerAddress.address.toLowerCase()] = 2;
           } else if (peerFollowingMe && meFollowingPeer) {
             tempIsVerified[peerAddress.address.toLowerCase()] = 3;
-          } else if (!peerFollowingMe && meFollowingPeer) {
-            tempIsVerified[peerAddress.address.toLowerCase()] = 1;
           }
         }
       });
+      console.log(
+        `the tempIsVerified is ${JSON.stringify(
+          tempIsVerified,
+        )} for filterMode ${filterMode}`,
+      );
 
       // update the isVerified status based on the filter mode
       Object.keys(tempIsVerified).forEach((key: any) => {
@@ -231,7 +236,7 @@ const ConversationsPanel = ({
       });
 
       setIsVerified(tempIsVerified);
-      var tmp = new Map(filtered);
+      var tmp = new Map(conversationsMap);
       conversationsMap.forEach((value: Conversation, key: string) => {
         if (tempIsVerified[value.peerAddress.toLowerCase()]) {
           tmp.set(key, value);
