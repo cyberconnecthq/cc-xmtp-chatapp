@@ -1,5 +1,5 @@
 import { QueryOptions, ApolloQueryResult } from "@apollo/client";
-import { client as apolloClient } from "../graphql/api";
+import { client as apolloClient } from "../graphql";
 
 interface CancellablePromise<T> extends Promise<T> {
   cancel: () => void;

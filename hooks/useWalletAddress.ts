@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useEnsAddress, useEnsName } from "wagmi";
 import { address } from "../components/Address";
-import { ProfileByAddress } from "../graphql/ProfileByAddress";
-import { gql, useQuery, useLazyQuery } from "@apollo/client";
+import { ProfileByAddress } from "../graphql";
+import { useQuery } from "@apollo/client";
 import {
-  isCCAddress,
   isEnsAddress,
   isValidLongWalletAddress,
   isValidRecipientAddressFormat,

@@ -17,11 +17,9 @@ const FollowUnfollowButton = ({ handle }: { handle: string }) => {
 
   useEffect(() => {
     const checkIfFollowing = async () => {
-      console.log("data", data);
       const isFollowedByMe = data?.profileByHandle?.isFollowedByMe || false;
       toggleIsFollowing(isFollowedByMe);
     };
-    console.log("handle", handle, "isFollowedByMe", isFollowing);
     checkIfFollowing();
   }, [handle, data]);
 

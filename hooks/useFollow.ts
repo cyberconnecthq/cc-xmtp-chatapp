@@ -15,12 +15,12 @@ function useFollow() {
         };
 
       toggleIsLoading(true);
-      console.log(
-        "follow",
-        handle,
-        "using",
-        (window as any).ethereum?.selectedAddress,
-      );
+      // console.log(
+      //   "follow",
+      //   handle,
+      //   "using",
+      //   (window as any).ethereum?.selectedAddress,
+      // );
       const error = await cc
         .follow(
           addressFromWagmi || (window?.ethereum as any)?.selectedAddress,
