@@ -62,7 +62,8 @@ const AddressInput = ({
           const otherUserProfileData = await apolloClient.query({
             query: ProfileByHandle,
             variables: {
-              handle,
+              handle: handle,
+              me: "0x0000000000000000000000000000000000000000",
             },
           });
           // console.log(otherUserProfileData?.data);

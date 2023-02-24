@@ -102,10 +102,11 @@ const RecipientControl = ({
   let follow_unfollow = <div></div>;
   if (ccName) {
     console.log("ccName & walletAddress", ccName, walletAddress);
+    const sanitized_ccName = ccName.replace(".cc", "");
     follow_unfollow = (
       <div className="justify-right right-16">
         <FollowUnfollowButton
-          handle={ccName}
+          handle={sanitized_ccName}
           // onSend={onSend}
         />
       </div>

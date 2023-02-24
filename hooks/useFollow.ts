@@ -1,10 +1,11 @@
 import { useCallback, useMemo, useState } from "react";
 import useCyberConnect from "./useCC";
+import { useAccount } from "wagmi";
 
 function useFollow() {
   const [isLoading, toggleIsLoading] = useState(false);
   const cc = useCyberConnect();
-
+  const { address: addressFromWagmi, isConnected } = useAccount();
   const follow = useCallback(
     async (handle: string) => {
       if (!cc)
@@ -14,14 +15,17 @@ function useFollow() {
         };
 
       toggleIsLoading(true);
-      // console.log(
-      //   "follow",
-      //   handle,
-      //   "using",
-      //   (window as any).ethereum?.selectedAddress,
-      // );
+      console.log(
+        "follow",
+        handle,
+        "using",
+        (window as any).ethereum?.selectedAddress,
+      );
       const error = await cc
-        .follow((window as any).ethereum?.selectedAddress, handle)
+        .follow(
+          addressFromWagmi || (window?.ethereum as any)?.selectedAddress,
+          handle,
+        )
         .catch((error) => {
           console.log(error);
 
