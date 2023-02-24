@@ -7,6 +7,10 @@ import Avatar from "./Avatar";
 import { useXmtpStore } from "../store/xmtp";
 import { useAccount } from "wagmi";
 
+type ConversationsListProps = {
+  conversations: Map<string, Conversation>;
+};
+
 type ConversationTileProps = {
   conversation: Conversation;
 };
@@ -100,8 +104,10 @@ const ConversationTile = ({
   );
 };
 
-const ConversationsList = (): JSX.Element => {
-  const conversations = useXmtpStore((state) => state.conversations);
+const ConversationsList = ({
+  conversations,
+}: ConversationsListProps): JSX.Element => {
+  // const conversations_original = useXmtpStore((state) => state.conversations);
   const previewMessages = useXmtpStore((state) => state.previewMessages);
 
   const orderByLatestMessage = (
@@ -118,7 +124,6 @@ const ConversationsList = (): JSX.Element => {
   if (!conversations || conversations.size == 0) {
     return <NoConversationsMessage />;
   }
-
   return (
     <>
       {conversations &&

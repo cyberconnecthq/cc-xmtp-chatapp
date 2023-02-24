@@ -6,6 +6,12 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import useHandleConnect from "../hooks/useHandleConnect";
 import useInitXmtpClient from "../hooks/useInitXmtpClient";
+import MyListbox from "./CyberConnect/MyListbox";
+import { useEffect, useState } from "react";
+import { BatchAddressesIsFollowedByMe } from "../graphql";
+import useWalletAddress from "../hooks/useWalletAddress";
+import { Conversation } from "@xmtp/xmtp-js";
+import { useCancellableQuery } from "../hooks/useCancellableQuery";
 
 type NavigationPanelProps = {
   isError: boolean;
@@ -20,7 +26,7 @@ const NavigationPanel = ({ isError }: NavigationPanelProps): JSX.Element => {
   return (
     <div className="flex-grow flex flex-col h-[calc(100vh-8rem)] overflow-y-auto">
       {address && client !== null ? (
-        <ConversationsPanel />
+        <ConversationsPanel walletAddress={address} />
       ) : (
         <>
           {!address ? (
@@ -133,11 +139,115 @@ const NoXMTPConnectedMessage: React.FC<{
   );
 };
 
-const ConversationsPanel = (): JSX.Element => {
+/**
+ * ConversationsPanel component
+ *
+ * @param {string} walletAddress - The wallet address of the user
+ * @return {JSX.Element} - The ConversationsPanel component
+ */
+const ConversationsPanel = ({
+  walletAddress,
+}: {
+  walletAddress: string;
+}): JSX.Element => {
+  // get the client from the store
   const client = useXmtpStore((state) => state.client);
+  // check if conversations are loading from the store
   const loadingConversations = useXmtpStore(
     (state) => state.loadingConversations,
   );
+  // get the ccName from the wallet address
+  const { ccName } = useWalletAddress(walletAddress);
+
+  // get the conversations map from the store
+  const conversationsMap = useXmtpStore((state) => state.conversations);
+
+  // convert the conversations map to an array
+  const conversations = Array.from(conversationsMap.values());
+  // get a duplicate array of the peer addresses
+  let peersDuplicate = conversations.map((x) => x.peerAddress);
+  // get an array of unique peer addresses
+  const peers = peersDuplicate.filter(
+    (n, i) => peersDuplicate.indexOf(n) === i,
+  );
+
+  // initialize state variables
+  const [filterMode, setFilterMode] = useState<number>(0);
+  const [isVerified, setIsVerified] = useState<any>();
+  const [filtered, setFiltered] = useState<any>(conversationsMap);
+
+  // handle the filter changes
+  useEffect(() => {
+    const handleFilter = async () => {
+      // query the batch addresses that are followed by the user
+      // eslint-disable-next-line no-use-before-define, react-hooks/rules-of-hooks
+      const { data } = await useCancellableQuery({
+        query: BatchAddressesIsFollowedByMe,
+        variables: { toAddrList: peers, me: walletAddress },
+      });
+      // initialize temporary object to store isVerified status of the peers
+      let tempIsVerified: any = {};
+      const peerAddresses = data?.batchGetAddresses;
+      //
+      peerAddresses.forEach((peerAddress: any) => {
+        // check if the peer is following the user
+        const peerFollowingMe =
+          peerAddress?.wallet?.primaryProfile?.isFollowedByMe;
+        let meFollowingPeer = false;
+        //
+        // check if the user is following the peer
+        type Node = { handle: string };
+        if (ccName) {
+          const extractHandles = (array: { node: Node }[]): string[] =>
+            array.map((item) => item.node.handle);
+          const followingsArr = peerAddress?.followings?.edges || [{}];
+          const followingHandles = extractHandles(followingsArr);
+          if (followingHandles.includes(ccName)) {
+            meFollowingPeer = true;
+          }
+        }
+
+        // initialize the isVerified status to 0
+        tempIsVerified[peerAddress.address.toLowerCase()] = 0;
+        // determine the isVerified status based on the filter mode
+        if (filterMode) {
+          if (peerFollowingMe && !meFollowingPeer) {
+            tempIsVerified[peerAddress.address.toLowerCase()] = 1;
+          } else if (!peerFollowingMe && meFollowingPeer) {
+            tempIsVerified[peerAddress.address.toLowerCase()] = 2;
+          } else if (peerFollowingMe && meFollowingPeer) {
+            tempIsVerified[peerAddress.address.toLowerCase()] = 3;
+          }
+        }
+      });
+      console.log(
+        `the tempIsVerified is ${JSON.stringify(
+          tempIsVerified,
+        )} for filterMode ${filterMode}`,
+      );
+
+      // update the isVerified status based on the filter mode
+      Object.keys(tempIsVerified).forEach((key: any) => {
+        if (tempIsVerified[key] === filterMode) {
+          tempIsVerified[key] = true;
+        } else {
+          tempIsVerified[key] = false;
+        }
+      });
+
+      setIsVerified(tempIsVerified);
+      var tmp = new Map(conversationsMap);
+      conversationsMap.forEach((value: Conversation, key: string) => {
+        if (tempIsVerified[value.peerAddress.toLowerCase()]) {
+          tmp.set(key, value);
+        } else {
+          tmp.delete(key);
+        }
+      });
+      setFiltered(tmp);
+    };
+    handleFilter();
+  }, [filterMode, conversationsMap]);
 
   if (client === undefined) {
     return (
@@ -158,11 +268,15 @@ const ConversationsPanel = (): JSX.Element => {
       />
     );
   }
-
+  //
+  console.log("filtered", filtered);
   return (
-    <nav className="flex-1 pb-4" data-testid="conversations-list-panel">
-      <ConversationsList />
-    </nav>
+    <div>
+      <MyListbox setFilterMode={setFilterMode} />
+      <nav className="flex-1 pb-4" data-testid="conversations-list-panel">
+        <ConversationsList conversations={filtered} />
+      </nav>
+    </div>
   );
 };
 

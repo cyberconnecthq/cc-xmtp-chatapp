@@ -1,16 +1,16 @@
 import { classNames, shortAddress } from "../helpers";
 import useWalletAddress from "../hooks/useWalletAddress";
-
 export type address = `0x${string}`;
 
 type AddressProps = {
   address: address;
+  enableFollow?: boolean;
   className?: string;
 };
 
 const Address = ({ address, className }: AddressProps): JSX.Element => {
   const { ensName, ccName, isLoading } = useWalletAddress(address);
-  console.log("ensName", ensName, "ccName", ccName);
+  // console.log("ensName", ensName, "ccName", ccName);
   let userLink = `https://etherscan.io/address/${address}`;
   if (ccName) {
     userLink = `https://www.link3.to/${ccName.replace(".cc", "")}`;

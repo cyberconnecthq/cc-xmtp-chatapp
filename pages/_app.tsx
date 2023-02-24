@@ -12,7 +12,7 @@ import { Wallet } from "ethers/lib";
 import React, { useEffect, useState } from "react";
 import { isAppEnvDemo } from "../helpers";
 import { ApolloProvider } from "@apollo/client";
-import { client as apolloClient } from "../graphql/api";
+import { client as apolloClient } from "../graphql";
 
 const AppWithoutSSR = dynamic(() => import("../components/App"), {
   ssr: false,

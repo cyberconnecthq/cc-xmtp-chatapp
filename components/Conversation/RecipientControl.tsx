@@ -13,6 +13,7 @@ import {
 } from "../../helpers";
 import { useAccount } from "wagmi";
 import { getRecipientInputSubtext } from "../../helpers";
+import FollowUnfollowButton from "../CyberConnect/FollowUnfollowButton";
 
 type RecipientControlProps = {
   setShowMessageView: Function;
@@ -98,6 +99,19 @@ const RecipientControl = ({
   } else {
     getUserLink = `https://etherscan.io/address/${recipientWalletAddress}`;
   }
+  let follow_unfollow = <div></div>;
+  if (ccName) {
+    console.log("ccName & walletAddress", ccName, walletAddress);
+    const sanitized_ccName = ccName.replace(".cc", "");
+    follow_unfollow = (
+      <div className="justify-right right-16">
+        <FollowUnfollowButton
+          handle={sanitized_ccName}
+          // onSend={onSend}
+        />
+      </div>
+    );
+  }
   return (
     <div className="flex-col flex-1">
       <div className="flex-1 flex-col justify-center flex bg-zinc-50 md:border-b md:border-gray-200 md:px-4 md:pb-[2px] max-h-16 min-h-[4rem]">
@@ -128,13 +142,15 @@ const RecipientControl = ({
               </div>
               <div className="w-full">
                 {isValid && (
-                  <a href={getUserLink} target="_blank" rel="noreferrer">
-                    <span
-                      className={recipientPillInputStyle(userIsSender)}
-                      data-testid="recipient-wallet-address">
-                      {toName}
-                    </span>
-                  </a>
+                  <div>
+                    <a href={getUserLink} target="_blank" rel="noreferrer">
+                      <span
+                        className={recipientPillInputStyle(userIsSender)}
+                        data-testid="recipient-wallet-address">
+                        {toName}
+                      </span>
+                    </a>
+                  </div>
                 )}
                 {!recipientWalletAddress && (
                   <AddressInput
@@ -146,6 +162,7 @@ const RecipientControl = ({
                 )}
               </div>
               <button type="submit" className="hidden" />
+              {follow_unfollow}
             </div>
           </form>
         </div>

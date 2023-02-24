@@ -1,7 +1,6 @@
 import { fetchEnsAddress } from "@wagmi/core";
 import React, { useEffect, useRef, useState } from "react";
-import { ProfileByHandle } from "../graphql/ProfileByHandle";
-import { client as apolloClient } from "../graphql/api";
+import { ProfileByHandle } from "../graphql";
 import {
   classNames,
   isCCAddress,
@@ -10,7 +9,7 @@ import {
   RecipientInputMode,
 } from "../helpers";
 import { address } from "./Address";
-
+import { useLazyQuery } from "@apollo/client";
 type AddressInputProps = {
   id?: string;
   name?: string;
@@ -40,6 +39,8 @@ const AddressInput = ({
     focusInputElementRef();
   }, []);
 
+  const [fetchProfile, { data }] = useLazyQuery(ProfileByHandle);
+
   useEffect(() => {
     const handleSubmit = async () => {
       if (recipientEnteredValue) {
@@ -59,16 +60,14 @@ const AddressInput = ({
           setRecipientInputMode &&
             setRecipientInputMode(RecipientInputMode.FindingEntry);
           const handle = recipientEnteredValue.replace(".cc", "");
-          const otherUserProfileData = await apolloClient.query({
-            query: ProfileByHandle,
+          const otherUserProfileData = await fetchProfile({
             variables: {
-              handle,
+              handle: handle,
+              me: "0x0000000000000000000000000000000000000000",
             },
           });
-          console.log(otherUserProfileData?.data);
           const address =
             otherUserProfileData?.data?.profileByHandle?.owner?.address;
-          console.log(address);
           if (address) {
             submitValue && submitValue(address);
           } else {
