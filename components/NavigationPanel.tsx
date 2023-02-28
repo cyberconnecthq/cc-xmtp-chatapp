@@ -196,16 +196,16 @@ const ConversationsPanel = ({
           console.log("data", addressesFollowStatusData);
           const peerAddresses =
             addressesFollowStatusData?.data?.batchGetAddresses;
-
+          // iterate through the peer addresses and determine the isVerified status of each peer based on the filter mode selected
           peerAddresses.forEach((peerAddress: any) => {
             // check if the peer is following the user
             const peerFollowingMe =
               peerAddress?.wallet?.primaryProfile?.isFollowedByMe;
             let meFollowingPeer = false;
-            //
             // check if the user is following the peer
             type Node = { profile: { handle: string } };
             if (ccName) {
+              // extract the handles from the followings array of the peer address object and check if the user's ccName is in the array
               const extractHandles = (array: { node: Node }[]): string[] =>
                 array.map((item) => item.node.profile.handle);
               const followingsArr = peerAddress?.followings?.edges || [{}];
@@ -228,31 +228,21 @@ const ConversationsPanel = ({
               }
             }
           });
-          console.log(
-            `the tempIsVerified is ${JSON.stringify(
-              tempIsVerified,
-            )} for filterMode ${filterMode}`,
-          );
 
           // update the isVerified status based on the filter mode
-          Object.keys(tempIsVerified).forEach((key: any) => {
-            if (tempIsVerified[key] === filterMode) {
-              tempIsVerified[key] = true;
-            } else {
-              tempIsVerified[key] = false;
-            }
+          Object.entries(tempIsVerified).forEach(([key, value]) => {
+            tempIsVerified[key] = value === filterMode;
           });
-
-          // setIsVerified(tempIsVerified);
-          var tmp = new Map(conversationsMap);
-          conversationsMap.forEach((value: Conversation, key: string) => {
-            if (tempIsVerified[value.peerAddress.toLowerCase()]) {
-              tmp.set(key, value);
-            } else {
-              tmp.delete(key);
-            }
-          });
-          setFiltered(tmp);
+          // filter the conversations map based on the isVerified status
+          const filteredMap = new Map(
+            Array.from(conversationsMap.entries()).filter(([key, value]) => {
+              const isVerified =
+                tempIsVerified[value.peerAddress.toLowerCase()];
+              return isVerified;
+            }),
+          );
+          // update the filtered state variable
+          setFiltered(filteredMap);
         }
       }
     };
