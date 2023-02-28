@@ -105,10 +105,7 @@ const RecipientControl = ({
     const sanitized_ccName = ccName.replace(".cc", "");
     follow_unfollow = (
       <div className="justify-right right-16">
-        <FollowUnfollowButton
-          handle={sanitized_ccName}
-          // onSend={onSend}
-        />
+        <FollowUnfollowButton handle={sanitized_ccName} />
       </div>
     );
   }

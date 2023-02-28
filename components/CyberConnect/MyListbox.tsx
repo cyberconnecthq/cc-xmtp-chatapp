@@ -13,7 +13,7 @@ const people = [
   { name: "Connected", index: 3 },
 ];
 
-export default function Example({ setFilterMode }: MyListboxProps) {
+export default function MyListbox({ setFilterMode }: MyListboxProps) {
   const [selected, setSelected] = useState(people[0]);
 
   function handleChange(e: any) {
