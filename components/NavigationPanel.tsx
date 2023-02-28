@@ -8,10 +8,10 @@ import useHandleConnect from "../hooks/useHandleConnect";
 import useInitXmtpClient from "../hooks/useInitXmtpClient";
 import MyListbox from "./CyberConnect/MyListbox";
 import { useEffect, useState } from "react";
-import { BatchAddressesIsFollowedByMe } from "../graphql";
+import { BatchAddressesFollowStatus } from "../graphql";
 import useWalletAddress from "../hooks/useWalletAddress";
 import { Conversation } from "@xmtp/xmtp-js";
-import { useCancellableQuery } from "../hooks/useCancellableQuery";
+import { useLazyQuery } from "@apollo/client";
 
 type NavigationPanelProps = {
   isError: boolean;
@@ -150,22 +150,23 @@ const ConversationsPanel = ({
 }: {
   walletAddress: string;
 }): JSX.Element => {
+  /* XMTP CONTEXT & STORE */
   // get the client from the store
   const client = useXmtpStore((state) => state.client);
   // check if conversations are loading from the store
   const loadingConversations = useXmtpStore(
     (state) => state.loadingConversations,
   );
-  // get the ccName from the wallet address
-  const { ccName } = useWalletAddress(walletAddress);
-
   // get the conversations map from the store
   const conversationsMap = useXmtpStore((state) => state.conversations);
 
+  // get the ccName from the wallet address
+  const { ccName } = useWalletAddress(walletAddress);
+
   // convert the conversations map to an array
-  const conversations = Array.from(conversationsMap.values());
-  // get a duplicate array of the peer addresses
-  let peersDuplicate = conversations.map((x) => x.peerAddress);
+  const peersDuplicate = Array.from(conversationsMap.values()).map(
+    (x) => x.peerAddress,
+  );
   // get an array of unique peer addresses
   const peers = peersDuplicate.filter(
     (n, i) => peersDuplicate.indexOf(n) === i,
@@ -173,78 +174,77 @@ const ConversationsPanel = ({
 
   // initialize state variables
   const [filterMode, setFilterMode] = useState<number>(0);
-  const [isVerified, setIsVerified] = useState<any>();
+  // const [isVerified, setIsVerified] = useState<any>();
   const [filtered, setFiltered] = useState<any>(conversationsMap);
-
+  // query the batch addresses that are followed by the user
+  const [getBatchAddressesFollowStatus] = useLazyQuery(
+    BatchAddressesFollowStatus,
+  );
   // handle the filter changes
   useEffect(() => {
     const handleFilter = async () => {
-      // query the batch addresses that are followed by the user
-      // eslint-disable-next-line no-use-before-define, react-hooks/rules-of-hooks
-      const { data } = await useCancellableQuery({
-        query: BatchAddressesIsFollowedByMe,
-        variables: { toAddrList: peers, me: walletAddress },
-      });
-      // initialize temporary object to store isVerified status of the peers
-      let tempIsVerified: any = {};
-      const peerAddresses = data?.batchGetAddresses;
-      //
-      peerAddresses.forEach((peerAddress: any) => {
-        // check if the peer is following the user
-        const peerFollowingMe =
-          peerAddress?.wallet?.primaryProfile?.isFollowedByMe;
-        let meFollowingPeer = false;
-        //
-        // check if the user is following the peer
-        type Node = { handle: string };
-        if (ccName) {
-          const extractHandles = (array: { node: Node }[]): string[] =>
-            array.map((item) => item.node.handle);
-          const followingsArr = peerAddress?.followings?.edges || [{}];
-          const followingHandles = extractHandles(followingsArr);
-          if (followingHandles.includes(ccName)) {
-            meFollowingPeer = true;
-          }
-        }
+      console.log("peers length", peers.length);
+      if (peers.length > 0) {
+        // get the follow status of the peers
+        const addressesFollowStatusData = await getBatchAddressesFollowStatus({
+          variables: { toAddrList: peers, me: walletAddress },
+          fetchPolicy: "cache-and-network",
+        });
+        if (addressesFollowStatusData) {
+          // initialize temporary object to store isVerified status of the peers
+          let tempIsVerified: any = {};
+          console.log("data", addressesFollowStatusData);
+          const peerAddresses =
+            addressesFollowStatusData?.data?.batchGetAddresses;
+          // iterate through the peer addresses and determine the isVerified status of each peer based on the filter mode selected
+          peerAddresses.forEach((peerAddress: any) => {
+            // check if the peer is following the user
+            const peerFollowingMe =
+              peerAddress?.wallet?.primaryProfile?.isFollowedByMe;
+            let meFollowingPeer = false;
+            // check if the user is following the peer
+            type Node = { profile: { handle: string } };
+            if (ccName) {
+              // extract the handles from the followings array of the peer address object and check if the user's ccName is in the array
+              const extractHandles = (array: { node: Node }[]): string[] =>
+                array.map((item) => item.node.profile.handle);
+              const followingsArr = peerAddress?.followings?.edges || [{}];
+              const followingHandles = extractHandles(followingsArr);
+              if (followingHandles.includes(ccName)) {
+                meFollowingPeer = true;
+              }
+            }
 
-        // initialize the isVerified status to 0
-        tempIsVerified[peerAddress.address.toLowerCase()] = 0;
-        // determine the isVerified status based on the filter mode
-        if (filterMode) {
-          if (peerFollowingMe && !meFollowingPeer) {
-            tempIsVerified[peerAddress.address.toLowerCase()] = 1;
-          } else if (!peerFollowingMe && meFollowingPeer) {
-            tempIsVerified[peerAddress.address.toLowerCase()] = 2;
-          } else if (peerFollowingMe && meFollowingPeer) {
-            tempIsVerified[peerAddress.address.toLowerCase()] = 3;
-          }
-        }
-      });
-      console.log(
-        `the tempIsVerified is ${JSON.stringify(
-          tempIsVerified,
-        )} for filterMode ${filterMode}`,
-      );
+            // initialize the isVerified status to 0
+            tempIsVerified[peerAddress.address.toLowerCase()] = 0;
+            // determine the isVerified status based on the filter mode
+            if (filterMode) {
+              if (peerFollowingMe && !meFollowingPeer) {
+                tempIsVerified[peerAddress.address.toLowerCase()] = 1;
+              } else if (!peerFollowingMe && meFollowingPeer) {
+                tempIsVerified[peerAddress.address.toLowerCase()] = 2;
+              } else if (peerFollowingMe && meFollowingPeer) {
+                tempIsVerified[peerAddress.address.toLowerCase()] = 3;
+              }
+            }
+          });
 
-      // update the isVerified status based on the filter mode
-      Object.keys(tempIsVerified).forEach((key: any) => {
-        if (tempIsVerified[key] === filterMode) {
-          tempIsVerified[key] = true;
-        } else {
-          tempIsVerified[key] = false;
+          // update the isVerified status based on the filter mode
+          Object.entries(tempIsVerified).forEach(([key, value]) => {
+            tempIsVerified[key] = value === filterMode;
+          });
+          // filter the conversations map based on the isVerified status
+          const filteredMap = new Map(
+            Array.from(conversationsMap.entries()).filter(([key, value]) => {
+              const isVerified =
+                tempIsVerified[value.peerAddress.toLowerCase()];
+              return isVerified;
+            }),
+          );
+          // update the filtered state variable
+          setFiltered(filteredMap);
         }
-      });
-
-      setIsVerified(tempIsVerified);
-      var tmp = new Map(conversationsMap);
-      conversationsMap.forEach((value: Conversation, key: string) => {
-        if (tempIsVerified[value.peerAddress.toLowerCase()]) {
-          tmp.set(key, value);
-        } else {
-          tmp.delete(key);
-        }
-      });
-      setFiltered(tmp);
+      }
     };
     handleFilter();
   }, [filterMode, conversationsMap]);
