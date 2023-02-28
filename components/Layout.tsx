@@ -13,6 +13,7 @@ import useListConversations from "../hooks/useListConversations";
 import { useXmtpStore } from "../store/xmtp";
 import useInitXmtpClient from "../hooks/useInitXmtpClient";
 import useWindowSize from "../hooks/useWindowSize";
+import useWalletAddress from "../hooks/useWalletAddress";
 
 const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const client = useXmtpStore((state) => state.client);

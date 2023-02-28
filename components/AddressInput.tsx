@@ -56,19 +56,24 @@ const AddressInput = ({
             setRecipientInputMode &&
               setRecipientInputMode(RecipientInputMode.InvalidEntry);
           }
+          // Check if the recipient is a ccProfile handle
         } else if (isCCAddress(recipientEnteredValue)) {
           setRecipientInputMode &&
             setRecipientInputMode(RecipientInputMode.FindingEntry);
+          // Remove the .cc from the handle
           const handle = recipientEnteredValue.replace(".cc", "");
+          // Fetch the profile data
           const otherUserProfileData = await fetchProfile({
             variables: {
               handle: handle,
               me: "0x0000000000000000000000000000000000000000",
             },
           });
+          // Get the address from the profile data
           const address =
             otherUserProfileData?.data?.profileByHandle?.owner?.address;
           if (address) {
+            //  If the address is valid, submit the value
             submitValue && submitValue(address);
           } else {
             setRecipientInputMode &&

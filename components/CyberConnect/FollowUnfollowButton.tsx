@@ -13,6 +13,7 @@ const FollowUnfollowButton = ({ handle }: { handle: string }) => {
   const { address: addressFromWagmi, isConnected } = useAccount();
   const { data } = useQuery(ProfileByHandle, {
     variables: { handle: handle, me: addressFromWagmi },
+    fetchPolicy: "cache-and-network",
   });
 
   useEffect(() => {
@@ -37,7 +38,11 @@ const FollowUnfollowButton = ({ handle }: { handle: string }) => {
 
   return (
     <button
-      className={isFollowing ? "follow-btn" : "unfollow-btn"}
+      className={
+        isFollowing
+          ? CyberConnectStyles.followBtn
+          : CyberConnectStyles.unfollowBtn
+      }
       onClick={handleClick}>
       {isFollowing ? "UnFollow" : "Follow"}
     </button>

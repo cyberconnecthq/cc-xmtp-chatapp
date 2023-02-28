@@ -11,15 +11,6 @@ export const ProfileByAddress = gql`
             address
             chainID
           }
-          externalMetadataInfo {
-            personal {
-              organization {
-                avatar
-                name
-                handle
-              }
-            }
-          }
           metadataInfo {
             avatar
             coverImage

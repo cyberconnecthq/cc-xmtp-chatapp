@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
-export const BatchAddressesIsFollowedByMe = gql`
-  query BatchAddressesIsFollowedByMe(
+export const BatchAddressesFollowStatus = gql`
+  query BatchAddressesFollowStatus(
     $me: AddressEVM!
     $toAddrList: [AddressEVM!]!
   ) {
@@ -15,7 +15,9 @@ export const BatchAddressesIsFollowedByMe = gql`
       followings {
         edges {
           node {
-            handle
+            profile {
+              handle
+            }
           }
         }
       }
