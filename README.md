@@ -17,16 +17,16 @@ git clone https://github.com/cyberconnecthq/cc-xmtp-chatapp && cd cc-xmtp-chatap
 ```bash
 npm install
 ```
-
-## Preview of deployed app
-### 👉  https://cc-xmtp-chatapp.vercel.app/
-![xmtp_cyberconnect_recording](public/xmtp_cyberconnect_recording.gif)
-
 ### Run the development server
 
 ```bash
 npm run dev
 ```
+
+## Preview of deployed app
+### 👉  https://cc-xmtp-chatapp.vercel.app/
+![xmtp_cyberconnect_recording](public/xmtp_cyberconnect_recording.gif)
+
 
 ----- 
 
