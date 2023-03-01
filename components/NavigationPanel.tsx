@@ -188,6 +188,8 @@ const ConversationsPanel = ({
         // get the follow status of the peers
         const addressesFollowStatusData = await getBatchAddressesFollowStatus({
           variables: { toAddrList: peers, me: walletAddress },
+          // TODO: Optimize this query to only fetch once the user has followed or unfollowed a peer
+          // Use cache-and-network to ensure that the data is always up to date in case the user follows or unfollows a peer while on the conversations page
           fetchPolicy: "cache-and-network",
         });
         if (addressesFollowStatusData) {
