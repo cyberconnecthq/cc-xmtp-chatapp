@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import useCyberConnect from "./useCC";
 
-function useUnFollow() {
+function useUnfollow() {
   const [isLoading, toggleIsLoading] = useState(false);
   const cc = useCyberConnect();
 
@@ -42,4 +42,4 @@ function useUnFollow() {
   );
 }
 
-export default useUnFollow;
+export default useUnfollow;
