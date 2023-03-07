@@ -7,6 +7,10 @@
 
 ![xmtp-x-cyberconnect-logo.png](public/xmtp-x-cyberconnect-logo.png)
 
+## Prerequisites 
+- Node.js installed (tested with `^18.2.0`)
+- NPM installed (tested with `^9.5.0`)
+
 ## Getting started
 ```bash
 git clone https://github.com/cyberconnecthq/cc-xmtp-chatapp && cd cc-xmtp-chatapp
