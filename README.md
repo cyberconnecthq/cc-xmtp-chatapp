@@ -12,6 +12,18 @@
 git clone https://github.com/cyberconnecthq/cc-xmtp-chatapp && cd cc-xmtp-chatapp
 ```
 
+## Setup Environment
+
+```bash
+cp .env.local.sample .env.local
+```
+
+### Input your Infura API Key
+```bash
+NEXT_PUBLIC_INFURA_ID='YOUR_API_KEY'
+NEXT_PUBLIC_XMTP_ENVIRONMENT='production'
+```
+
 ### Install the package
 
 ```bash
