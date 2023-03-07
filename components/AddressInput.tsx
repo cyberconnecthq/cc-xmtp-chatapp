@@ -60,8 +60,8 @@ const AddressInput = ({
         } else if (isCCAddress(recipientEnteredValue)) {
           setRecipientInputMode &&
             setRecipientInputMode(RecipientInputMode.FindingEntry);
-          // Remove the .cc from the handle
-          const handle = recipientEnteredValue.replace(".cc", "");
+          // Remove the .cyber from the handle
+          const handle = recipientEnteredValue.replace(".cyber", "");
           // Fetch the profile data
           const otherUserProfileData = await fetchProfile({
             variables: {
