@@ -93,7 +93,7 @@ const RecipientControl = ({
   const toName = ccName || ensName || recipientWalletAddress;
   let getUserLink = "";
   if (ccName) {
-    getUserLink = `https://www.link3.to/${ccName.replace(".cc", "")}`;
+    getUserLink = `https://www.link3.to/${ccName.replace(".cyber", "")}`;
   } else if (ensName) {
     getUserLink = `https://app.ens.domains/name/${ensName}`;
   } else {
@@ -102,7 +102,7 @@ const RecipientControl = ({
   let follow_unfollow = <div></div>;
   if (ccName) {
     console.log("ccName & walletAddress", ccName, walletAddress);
-    const sanitized_ccName = ccName.replace(".cc", "");
+    const sanitized_ccName = ccName.replace(".cyber", "");
     follow_unfollow = (
       <div className="justify-right right-16">
         <FollowUnfollowButton handle={sanitized_ccName} />

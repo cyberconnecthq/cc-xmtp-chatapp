@@ -47,7 +47,7 @@ export const isEnsAddress = (address: string): boolean => {
 };
 
 export const isCCAddress = (address: string): boolean => {
-  return address.endsWith(".cc");
+  return address.endsWith(".cyber");
 };
 
 export const shortAddress = (addr: string): string =>

@@ -45,7 +45,7 @@ const useWalletAddress = (address?: address | string) => {
   useEffect(() => {
     setAddressToUse(address || recipientWalletAddress);
     const ccHandle = ccNameData?.address?.wallet?.primaryProfile?.handle;
-    const ccName = ccHandle; // ? ccHandle + ".cc" : "";
+    const ccName = ccHandle;
     setCcName(ccName);
     // console.log("ccName", ccName);
   }, [recipientWalletAddress, address, ccNameData]);

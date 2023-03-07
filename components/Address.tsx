@@ -13,7 +13,7 @@ const Address = ({ address, className }: AddressProps): JSX.Element => {
   // console.log("ensName", ensName, "ccName", ccName);
   let userLink = `https://etherscan.io/address/${address}`;
   if (ccName) {
-    userLink = `https://www.link3.to/${ccName.replace(".cc", "")}`;
+    userLink = `https://www.link3.to/${ccName.replace(".cyber", "")}`;
   } else if (ensName) {
     userLink = `https://app.ens.domains/name/${ensName}`;
   }
